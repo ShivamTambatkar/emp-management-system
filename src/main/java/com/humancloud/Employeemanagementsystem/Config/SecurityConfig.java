@@ -32,14 +32,50 @@ public class SecurityConfig {
         return new EmployeeDetailsService();
     }
 
+
+    //For Authorization of user
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+         String[] PUBLIC_URL={
+                 "/emp/create",
+                 "/emp/authenticate",
+                 "/swagger-ui/**",
+                 "/swagger-resources/**",
+                 "/v3/api-docs/**"};
+         String[]ADMIN_URL={
+
+                 "/emp/allemp",
+                 "/emp/search-employee/{keyword}",
+                 "/emp/delete/{empId}",
+                 "/lc/create-leavecategory",
+                 "/lc/update-leavecategory/{lcId}",
+                 "/lc/getall-leavecategories",
+                 "/lc/deletelc/{lcId}",
+                 "/lc/getleavecategory/{lcId}",
+                 "/leaves/getall-leaves"};
+
+          String [] MANAGER_URL={"/leaves/reject-leave/leave/{leaveId}/manager/{reportingManagerId}",
+                  "/leaves/approve-leave/leave/{leaveId}/manager/{reportingManagerId}",
+                  "/leaves/pending-leaves-requests/{reportingMangerId}",
+                  "/leaves/leaves/{empId}"};
+          String [] EMPLOYEE_URL={
+                  "/emp/{empId}",
+                  "/leaves/apply-leave/{empId}",
+                  "/leaves/update-leave/{leaveId}"
+                  ,"/leaves/pending-leaves/{empId}",
+                  "/lc/getall-leavecategories",
+                  "/lc/getleavecategory/{lcId}"};
+
         return http.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/emp/**").permitAll()
+                .requestMatchers(PUBLIC_URL).permitAll()
                 .and()
-                .authorizeHttpRequests().requestMatchers("/admin/**")
-                .authenticated().and()
+                .authorizeHttpRequests().requestMatchers(ADMIN_URL).hasAuthority("ADMIN")
+                .requestMatchers(MANAGER_URL).hasAuthority("MANAGER")
+                .requestMatchers(EMPLOYEE_URL).hasAuthority("EMPLOYEE")
+                .requestMatchers("/emp/update/{empId}/rm/{rmId}").hasAuthority("ADMIN")
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -47,11 +83,12 @@ public class SecurityConfig {
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
+ // For Encrypting Password
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    //
 
     @Bean
     public AuthenticationProvider authenticationProvider(){

@@ -1,6 +1,8 @@
 package com.humancloud.Employeemanagementsystem.Service.Impl;
 
 import com.humancloud.Employeemanagementsystem.DTO.EmployeeDTO;
+import com.humancloud.Employeemanagementsystem.DTO.EmployeeResponseDTO;
+import com.humancloud.Employeemanagementsystem.DTO.EmployeeUpdateDTO;
 import com.humancloud.Employeemanagementsystem.Entity.Employee;
 import com.humancloud.Employeemanagementsystem.Exceptions.ResourceNotFoundException;
 import com.humancloud.Employeemanagementsystem.Repository.EmployeeRepository;
@@ -36,27 +38,32 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public String updateEmployee(Integer empId,EmployeeDTO employeeDTO) {
+    public String updateEmployee(Integer empId, EmployeeUpdateDTO employeeDTO,Integer reportingManagerId) {
         Employee employee = this.employeeRepository.findById(empId).orElseThrow(()->new ResourceNotFoundException("employee","empId ",empId));
+        Employee repotingManager = employeeRepository.findById(reportingManagerId).orElseThrow(() -> new ResourceNotFoundException("employee", "empId ", empId));
+
         employee.setMobile(employeeDTO.getMobile()!=null ? employeeDTO.getMobile() : employee.getMobile());
         employee.setName(employeeDTO.getName()!=null ? employeeDTO.getName() : employee.getName() );
         employee.setEmail(employeeDTO.getEmail()!=null ? employeeDTO.getEmail() : employee.getEmail() );
         employee.setPassword(employeeDTO.getPassword()!=null ? employeeDTO.getPassword() : employee.getPassword() );
+        employee.setRoles(employeeDTO.getRoles()!=null ? employeeDTO.getRoles():employee.getRoles());
+        employee.setReportingManager(repotingManager);
+
         this.employeeRepository.save(employee);
         return "Hurray!! Employee updated SuccessFully";
     }
 
     @Override
-    public List<EmployeeDTO> getAllEmployee() {
+    public List<EmployeeResponseDTO> getAllEmployee() {
         List<Employee> employeeList = this.employeeRepository.findAll();
-        List<EmployeeDTO> employeeDTOS = employeeList.stream().map(emp -> this.modelMapper.map(emp, EmployeeDTO.class)).collect(Collectors.toList());
+        List<EmployeeResponseDTO> employeeDTOS = employeeList.stream().map(emp -> this.modelMapper.map(emp, EmployeeResponseDTO.class)).collect(Collectors.toList());
         return  employeeDTOS;
     }
 
     @Override
-    public EmployeeDTO getSingleEmployee(Integer empId) {
+    public EmployeeResponseDTO getSingleEmployee(Integer empId) {
         Employee employee = this.employeeRepository.findById(empId).orElseThrow(()->new ResourceNotFoundException("employee","empId ",empId));
-        return this.modelMapper.map(employee,EmployeeDTO.class);
+        return this.modelMapper.map(employee,EmployeeResponseDTO.class);
 
     }
 
@@ -68,9 +75,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeDTO> searchEmployee(String name) {
+    public List<EmployeeResponseDTO> searchEmployee(String name) {
         List<Employee> searchedEmployee = this.employeeRepository.findByNameContaining(name);
-        List<EmployeeDTO> employeeDTOS = searchedEmployee.stream().map(employee  -> modelMapper.map(employee, EmployeeDTO.class)).collect(Collectors.toList());
+        List<EmployeeResponseDTO> employeeDTOS = searchedEmployee.stream().map(employee  -> modelMapper.map(employee, EmployeeResponseDTO.class)).collect(Collectors.toList());
         return employeeDTOS;
     }
 
