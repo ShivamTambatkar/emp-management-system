@@ -1,5 +1,6 @@
 package com.humancloud.Employeemanagementsystem.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,13 +18,14 @@ public class Employee {
     private Integer id;
     private String name;
     private String email;
+    @JsonIgnore
     private String password;
     private  String mobile;
 
     private String roles;
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "employee")
     private List<Leaves> leaves;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "rmId")
     private Employee reportingManager;
 

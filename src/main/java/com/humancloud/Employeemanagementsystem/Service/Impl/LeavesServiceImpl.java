@@ -94,7 +94,7 @@ public class LeavesServiceImpl implements LeavesServices {
     @Override
     public String rejectLeave(Integer leaveId, Integer reportingManagerId) {
         Leaves leave = this.leavesRepository.findById(leaveId).orElseThrow(() -> new ResourceNotFoundException("leave", "leaveId", leaveId));
-        if (!leave.getEmployee().getReportingManager().getId().equals(reportingManagerId)) {
+         if (!leave.getEmployee().getReportingManager().getId().equals(reportingManagerId)) {
             throw new UnauthorizedException("reportingmanager", "ReportingManagerId", reportingManagerId);
         }
         leave.setLeaveStatus(LeaveStatus.REJECT);

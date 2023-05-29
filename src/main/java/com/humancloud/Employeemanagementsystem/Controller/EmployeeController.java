@@ -1,9 +1,6 @@
 package com.humancloud.Employeemanagementsystem.Controller;
 
-import com.humancloud.Employeemanagementsystem.DTO.AuthRequest;
-import com.humancloud.Employeemanagementsystem.DTO.EmployeeDTO;
-import com.humancloud.Employeemanagementsystem.DTO.LeaveResponseDTO;
-import com.humancloud.Employeemanagementsystem.DTO.LeavesDTO;
+import com.humancloud.Employeemanagementsystem.DTO.*;
 import com.humancloud.Employeemanagementsystem.Service.EmployeeService;
 import com.humancloud.Employeemanagementsystem.Service.JwtService;
 import com.humancloud.Employeemanagementsystem.Service.LeavesServices;
@@ -61,27 +58,27 @@ public class EmployeeController {
 
 
 
-@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PutMapping("/update/{empId}")
-    public ResponseEntity<String> updateEmployee(@PathVariable Integer empId, @RequestBody EmployeeDTO employeeDTO) {
-        String employee = this.employeeService.updateEmployee(empId, employeeDTO);
+
+    @PutMapping("/update/{empId}/rm/{rmId}")
+    public ResponseEntity<String> updateEmployee(@PathVariable Integer empId, @RequestBody EmployeeUpdateDTO employeeDTO,@PathVariable Integer rmId) {
+        String employee = this.employeeService.updateEmployee(empId, employeeDTO,rmId);
         return new ResponseEntity<String>(employee, HttpStatus.OK);
     }
 
     @GetMapping("/allemp")
-    public ResponseEntity<List<EmployeeDTO>> getAllEmployee() {
-        List<EmployeeDTO> allEmployee = this.employeeService.getAllEmployee();
+    public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployee() {
+        List<EmployeeResponseDTO> allEmployee = this.employeeService.getAllEmployee();
         return ResponseEntity.ok(allEmployee);
     }
     @GetMapping("/search-employee/{keyword}")
-    public ResponseEntity<List<EmployeeDTO>> searchEmployee(@PathVariable String keyword) {
-        List<EmployeeDTO> employeeDTOS = this.employeeService.searchEmployee(keyword);
+    public ResponseEntity<List<EmployeeResponseDTO>> searchEmployee(@PathVariable String keyword) {
+        List<EmployeeResponseDTO> employeeDTOS = this.employeeService.searchEmployee(keyword);
         return ResponseEntity.ok(employeeDTOS);
     }
 
     @GetMapping("/{empId}")
-    public ResponseEntity<EmployeeDTO> getSingleEmployee(@PathVariable Integer empId) {
-        EmployeeDTO singleEmployee = this.employeeService.getSingleEmployee(empId);
+    public ResponseEntity<EmployeeResponseDTO> getSingleEmployee(@PathVariable Integer empId) {
+        EmployeeResponseDTO singleEmployee = this.employeeService.getSingleEmployee(empId);
         return ResponseEntity.ok(singleEmployee);
     }
 
@@ -91,34 +88,6 @@ public class EmployeeController {
     public ResponseEntity<String> deleteEmployee(@PathVariable Integer empId) {
         String message = this.employeeService.deleteEmployee(empId);
         return new ResponseEntity<String>(message, HttpStatus.OK);
-    }
-
-
-    @GetMapping("/leaves/{empId}")
-    public ResponseEntity<List<LeaveResponseDTO>> getallEmployeeLeaves(@PathVariable Integer empId) {
-        List<LeaveResponseDTO> leaveByUserID = this.leavesServices.getLeaveByUserID(empId);
-        return ResponseEntity.ok(leaveByUserID);
-
-    }
-
-    @PostMapping("/apply-leave/{empId}")
-    public ResponseEntity<String> applyLeaves(@PathVariable Integer empId, @RequestBody LeavesDTO leavesDTO) {
-        String leavesDto = this.leavesServices.createLeaves(empId, leavesDTO);
-        return new ResponseEntity<>(leavesDto, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/update-leave/{leaveId}")
-    public ResponseEntity<String> updateLeaveApplication(@PathVariable Integer leaveId, @RequestBody LeavesDTO leavesDTO) {
-        String updateLeaves = this.leavesServices.updateLeaves(leaveId, leavesDTO);
-        return new ResponseEntity<>(updateLeaves, HttpStatus.OK);
-
-    }
-
-
-    @GetMapping("/pending-leaves/{empId}")
-    public  ResponseEntity<List<LeaveResponseDTO>> getPendingLeavesOfEmployee(@PathVariable Integer empId){
-        List<LeaveResponseDTO> allPendingLeavesOfEmployee = this.leavesServices.getAllPendingLeavesOfEmployee(empId);
-        return ResponseEntity.ok(allPendingLeavesOfEmployee);
     }
 
 
