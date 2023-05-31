@@ -48,24 +48,26 @@ public class SecurityConfig {
                  "/emp/allemp",
                  "/emp/search-employee/{keyword}",
                  "/emp/delete/{empId}",
-                 "/lc/create-leavecategory",
-                 "/lc/update-leavecategory/{lcId}",
-                 "/lc/getall-leavecategories",
-                 "/lc/deletelc/{lcId}",
-                 "/lc/getleavecategory/{lcId}",
+                 "/lc/**",
                  "/leaves/getall-leaves"};
 
-          String [] MANAGER_URL={"/leaves/reject-leave/leave/{leaveId}/manager/{reportingManagerId}",
+
+          String [] MANAGER_URL={
+
+                  "/leaves/reject-leave/leave/{leaveId}/manager/{reportingManagerId}",
                   "/leaves/approve-leave/leave/{leaveId}/manager/{reportingManagerId}",
                   "/leaves/pending-leaves-requests/{reportingMangerId}",
-                  "/leaves/leaves/{empId}"};
+                  "/leaves/leaves/{empId}",
+                   "holidays/all"};
+
           String [] EMPLOYEE_URL={
                   "/emp/{empId}",
                   "/leaves/apply-leave/{empId}",
                   "/leaves/update-leave/{leaveId}"
                   ,"/leaves/pending-leaves/{empId}",
                   "/lc/getall-leavecategories",
-                  "/lc/getleavecategory/{lcId}"};
+                  "/lc/getleavecategory/{lcId}",
+                  "holidays/all"};
 
         return http.csrf().disable()
                 .authorizeHttpRequests()
@@ -75,6 +77,8 @@ public class SecurityConfig {
                 .requestMatchers(MANAGER_URL).hasAuthority("MANAGER")
                 .requestMatchers(EMPLOYEE_URL).hasAuthority("EMPLOYEE")
                 .requestMatchers("/emp/update/{empId}/rm/{rmId}").hasAuthority("ADMIN")
+                .requestMatchers("/holidays/**").hasAuthority("ADMIN")
+                .requestMatchers("/emp-profile/**").hasAnyRole("ADMIN","EMPLOYEE","MANAGER")
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
