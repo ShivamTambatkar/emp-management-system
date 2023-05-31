@@ -4,6 +4,7 @@ import com.humancloud.Employeemanagementsystem.DTO.*;
 import com.humancloud.Employeemanagementsystem.Service.EmployeeService;
 import com.humancloud.Employeemanagementsystem.Service.JwtService;
 import com.humancloud.Employeemanagementsystem.Service.LeavesServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class EmployeeController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<String> createEmployee(@RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<String> createEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
         String employee = this.employeeService.createEmployee(employeeDTO);
         return new ResponseEntity<String>(employee, HttpStatus.CREATED);
     }
@@ -45,7 +46,7 @@ public class EmployeeController {
 
 
     @PostMapping("/authenticate")
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+    public String authenticateAndGetToken(@Valid @RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (authentication.isAuthenticated()) {
             return jwtService.generateToken(authRequest.getUsername());

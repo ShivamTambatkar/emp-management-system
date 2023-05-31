@@ -4,11 +4,15 @@ import com.humancloud.Employeemanagementsystem.DTO.EmployeeDTO;
 import com.humancloud.Employeemanagementsystem.DTO.EmployeeResponseDTO;
 import com.humancloud.Employeemanagementsystem.DTO.EmployeeUpdateDTO;
 import com.humancloud.Employeemanagementsystem.Entity.Employee;
+import com.humancloud.Employeemanagementsystem.Exceptions.EmailAllReadyExitsException;
 import com.humancloud.Employeemanagementsystem.Exceptions.ResourceNotFoundException;
+import com.humancloud.Employeemanagementsystem.Helper.ErrorResponse;
 import com.humancloud.Employeemanagementsystem.Repository.EmployeeRepository;
 import com.humancloud.Employeemanagementsystem.Service.EmployeeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,16 +30,27 @@ public class EmployeeServiceImpl implements EmployeeService {
     private PasswordEncoder passwordEncoder;
 
 
+    public  boolean exitsByEmail(String email){
+        return this.employeeRepository.existsByEmail(email);
+    }
+
     @Override
     public String createEmployee(EmployeeDTO employeeDTO) {
+        if (exitsByEmail(employeeDTO.getEmail())) {
+            throw new EmailAllReadyExitsException("User","EmailId",employeeDTO.getEmail());
+        } else {
 
-        Employee employee = modelMapper.map(employeeDTO, Employee.class);
-        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
+            Employee employee = modelMapper.map(employeeDTO, Employee.class);
+
+            employee.setPassword(passwordEncoder.encode(employee.getPassword()));
 
 
-        this.employeeRepository.save(employee);
-        return "Hurray !! Employee Register Successfully !!!";
+            this.employeeRepository.save(employee);
+            return "Hurray !! Employee Register Successfully !!!";
+        }
     }
+
+
 
     @Override
     public String updateEmployee(Integer empId, EmployeeUpdateDTO employeeDTO,Integer reportingManagerId) {
@@ -80,8 +95,4 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<EmployeeResponseDTO> employeeDTOS = searchedEmployee.stream().map(employee  -> modelMapper.map(employee, EmployeeResponseDTO.class)).collect(Collectors.toList());
         return employeeDTOS;
     }
-
-
-
-
 }
